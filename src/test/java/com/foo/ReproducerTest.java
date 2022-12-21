@@ -7,6 +7,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.mapping.DiscriminatorFunction;
+import dev.morphia.mapping.MapperOptions;
+import dev.morphia.mapping.NamingStrategy;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -18,7 +22,17 @@ public class ReproducerTest extends BottleRocketTest {
         MongoClient mongo = getMongoClient();
         MongoDatabase database = getDatabase();
         database.drop();
-        datastore = Morphia.createDatastore(mongo, getDatabase().getName());
+        datastore = Morphia.createDatastore(mongo, getDatabase().getName(),
+        		MapperOptions.builder()
+        		.mapSubPackages(true)
+				.discriminator(DiscriminatorFunction.className())
+				.discriminatorKey("className")
+				.collectionNaming(NamingStrategy.identity())
+				.propertyNaming(NamingStrategy.identity())
+//				.codecProvider(new ExceedCodecProvider())
+				.storeEmpties(true)
+				.build()
+        		);
     }
 
     @NotNull
@@ -35,6 +49,8 @@ public class ReproducerTest extends BottleRocketTest {
 
     @Test
     public void reproduce() {
+    	datastore.save(new Conversation());
+    	datastore.save(new EmailOutboundLeadCommunicationEntity());
     }
 
 }
