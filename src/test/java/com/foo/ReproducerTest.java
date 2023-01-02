@@ -2,13 +2,18 @@ package com.foo;
 
 import com.antwerkz.bottlerocket.BottleRocket;
 import com.antwerkz.bottlerocket.BottleRocketTest;
+import com.foo.MyEntity.TheEnum;
 import com.github.zafarkhaja.semver.Version;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+
+import java.util.EnumSet;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ReproducerTest extends BottleRocketTest {
@@ -35,6 +40,14 @@ public class ReproducerTest extends BottleRocketTest {
 
     @Test
     public void reproduce() {
+    	MyEntity entity = new MyEntity();
+    	entity.enumSet = EnumSet.of(TheEnum.ONE);
+    	
+    	datastore.save(entity);
+    	
+    	entity = datastore.find(MyEntity.class).first();
+    	
+    	Assert.assertEquals(TheEnum.ONE, entity.enumSet.iterator().next());
     }
 
 }
